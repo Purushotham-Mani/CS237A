@@ -2,12 +2,13 @@
 
 import rclpy                    # ROS2 client library
 from rclpy.node import Node     # ROS2 node baseclass
-from asl_tb3_lib.control import BaseNavigator
+from asl_tb3_lib.navigation import BaseNavigator, TrajectoryPlan
 from asl_tb3_lib.math_utils import wrap_angle
 from asl_tb3_lib.tf_utils import quaternion_to_yaw
 from asl_tb3_msgs.msg import TurtleBotControl, TurtleBotState
-from scipy.interpolate import splev
-
+from scipy.interpolate import splev, splrep
+from asl_tb3_lib.grids import StochOccupancyGrid2D
+import typing as T
 V_PREV_THRES = 0.0001
 
 
@@ -50,7 +51,7 @@ class AStar(object):
               useful here
         """
         ########## Code starts here ##########
-        isfree = self.occupancy.is_free(x)
+        isfree = self.occupancy.is_free(np.asarray(x))
         isin = (x[0]>=self.statespace_lo[0] and x[0]<=self.statespace_hi[0]) and (x[1]>=self.statespace_lo[1] and x[1]<=self.statespace_hi[1])
         return (isfree and isin)
         ########## Code ends here ##########
@@ -201,49 +202,16 @@ class AStar(object):
         return False
         ########## Code ends here ##########
 
-class DetOccupancyGrid2D(object):
-    """
-    A 2D state space grid with a set of rectangular obstacles. The grid is
-    fully deterministic
-    """
-    def __init__(self, width, height, obstacles):
-        self.width = width
-        self.height = height
-        self.obstacles = obstacles
-
-    def is_free(self, x):
-        """Verifies that point is not inside any obstacles by some margin"""
-        for obs in self.obstacles:
-            if x[0] >= obs[0][0] - self.width * .01 and \
-               x[0] <= obs[1][0] + self.width * .01 and \
-               x[1] >= obs[0][1] - self.height * .01 and \
-               x[1] <= obs[1][1] + self.height * .01:
-                return False
-        return True
-
-    def plot(self, fig_num=0):
-        """Plots the space and its obstacles"""
-        fig = plt.figure(fig_num)
-        ax = fig.add_subplot(111, aspect='equal')
-        for obs in self.obstacles:
-            ax.add_patch(
-            patches.Rectangle(
-            obs[0],
-            obs[1][0]-obs[0][0],
-            obs[1][1]-obs[0][1],))
-        ax.set(xlim=(0,self.width), ylim=(0,self.height))
-
-
 
 class Navigator(BaseNavigator):
-    def __init__(self, kpx: float, kpy: float, kdx: float, kdy: float) -> None:
+    def __init__(self) -> None:
         # give it a default node name
         super().__init__("Navigator")
         self.kp = 2.0
-        self.kpx = kpx
-        self.kpy = kpy
-        self.kdx = kdx
-        self.kdy = kdy
+        self.kpx = 2.0
+        self.kpy = 2.0
+        self.kdx = 2.0
+        self.kdy = 2.0
 
         self.coeffs = np.zeros(8)
 
@@ -260,6 +228,7 @@ class Navigator(BaseNavigator):
         err = wrap_angle(h_des.theta - h_curr.theta)
         
         msg = TurtleBotControl()
+        msg.v = 0.
         msg.omega = self.kp * err
         return msg
     
@@ -311,7 +280,7 @@ class Navigator(BaseNavigator):
         return msg
         
 
-    def compute_trajectory_plan(self, state: TurtleBotState, goal: TurtleBotState, occupancy: DetOccupancyGrid2D, resolution: float, horizon: float,) -> T.Optional[TrajectoryPlan]:
+    def compute_trajectory_plan(self, state: TurtleBotState, goal: TurtleBotState, occupancy: StochOccupancyGrid2D, resolution: float, horizon: float,) -> T.Optional[TrajectoryPlan]:
         """ Compute a trajectory plan using A* and cubic spline fitting
 
         Args:
@@ -324,7 +293,8 @@ class Navigator(BaseNavigator):
         Returns:
             T.Optional[TrajectoryPlan]:
         """
-        astar = AStar((0,0),(horizon,horizon),(state.x,state.y),(goal.x,goal.y), occupancy, resolution=resolution)  ## are we using occupancy and horizon the right way?
+        print("1")
+        astar = AStar((state.x-horizon,state.y-horizon),(state.x+horizon,state.y+horizon),(state.x,state.y),(goal.x,goal.y), occupancy, resolution=resolution)  
         if not astar.solve() or len(astar.path)<4:
             return None
         
@@ -332,14 +302,18 @@ class Navigator(BaseNavigator):
         v_desired, spline_alpha = 0.15, 0.05
         path = np.asarray(astar.path)
         ts = [astar.resolution/v_desired*i for i in range(0,len(path))]
-        path_x_spline = scipy.interpolate.splrep(x=ts,y=path[:,0],s=spline_alpha)
-        path_y_spline = scipy.interpolate.splrep(x=ts,y=path[:,1],s=spline_alpha)
+        path_x_spline = splrep(x=ts,y=path[:,0],s=spline_alpha)
+        path_y_spline = splrep(x=ts,y=path[:,1],s=spline_alpha)
         
         return TrajectoryPlan(path=path, path_x_spline=path_x_spline, path_y_spline=path_y_spline, duration=ts[-1])
 
 
+def main():
+    rclpy.init(args=None)
+    print("main")
+    node = Navigator()
+    rclpy.spin(node)
+    rclpy.shutdown()
+
 if __name__ == "__main__":
-    rclpy.init()            # initialize ROS client library
-    node = Navigator()    # create the node instance
-    rclpy.spin(node)        # call ROS2 default scheduler
-    rclpy.shutdown()        # clean up after node exits
+    main()
