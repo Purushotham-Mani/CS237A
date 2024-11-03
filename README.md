@@ -40,8 +40,14 @@ Code can be found in HW2/P3_gain_scheduled_LQR.ipynb
 
 ## Camera Caliberation: Extrinsics Caliberation
 
+![image](https://github.com/user-attachments/assets/3863c5a8-eb65-4e17-bcb4-4ab0a2baad7c)
+
+
 ## Object Detection: Using Torchvision
 
 ![image](https://github.com/user-attachments/assets/ef677154-aa89-48c5-856a-d013eee6bba5)
 
 ## Iterative Closest Point Algorithm for point Cloud Registration:
+
+![image](https://github.com/user-attachments/assets/be85aed7-cacb-460a-86cd-3f31c129b22f)
+
