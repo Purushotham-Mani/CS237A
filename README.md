@@ -27,6 +27,7 @@ Code can be found in HW1/P3_trajectory_optimization.ipynb
 ## Differential Flatness of differential drive bot:
 
 Exploiting differential flatness of a drifferential drive robot to compute output trajectory and the corresponding control required to achieve the trajectory.
+
 ![Screenshot from 2024-11-03 01-31-43](https://github.com/user-attachments/assets/d3002719-e643-4612-8204-8a64777f8d30)
 
 Code can be found in HW2/P2_differential_flatness.py and HW2/P2_trajectory_tracking.py and corresponding visualisation can be done using HW2/sim_trajectory.ipynb
