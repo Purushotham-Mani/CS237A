@@ -36,6 +36,12 @@ Code can be found in HW2/P2_differential_flatness.py and HW2/P2_trajectory_track
 
 ![image](https://github.com/user-attachments/assets/8a1d10dc-5593-4613-99f6-86a1da84113d)
 
-
 Code can be found in HW2/P3_gain_scheduled_LQR.ipynb
 
+## Camera Caliberation: Extrinsics Caliberation
+
+## Object Detection: Using Torchvision
+
+![image](https://github.com/user-attachments/assets/ef677154-aa89-48c5-856a-d013eee6bba5)
+
+## Iterative Closest Point Algorithm for point Cloud Registration:
