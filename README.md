@@ -51,3 +51,19 @@ Code can be found in HW2/P3_gain_scheduled_LQR.ipynb
 
 ![image](https://github.com/user-attachments/assets/be85aed7-cacb-460a-86cd-3f31c129b22f)
 
+## Bundle Adjustment SLAM using GTSAM
+
+![Screenshot from 2024-11-20 15-58-28](https://github.com/user-attachments/assets/7d85742e-fd95-4a98-87e8-a504e1c8d154)
+
+## Frontier Exploration
+
+Robot builds a StochOccupancyGrid using the LiDAR measurements and explores the environment its placed in until it has mapped the entire space.
+
+Controller (flatness-based), Planning (A* and path smoothening)
+ 
+[Screencast from 11-20-2024 03:47:41 PM.webm](https://github.com/user-attachments/assets/3ce0eb0f-4a0d-4068-91e3-a8c6b2d09f28)
+
+
+
+
+
