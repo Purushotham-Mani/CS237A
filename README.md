@@ -60,8 +60,11 @@ Code can be found in HW2/P3_gain_scheduled_LQR.ipynb
 Robot builds a StochOccupancyGrid using the LiDAR measurements and explores the environment its placed in until it has mapped the entire space.
 
 Controller (flatness-based), Planning (A* and path smoothening)
- 
-[Screencast from 11-20-2024 03:47:41 PM.webm](https://github.com/user-attachments/assets/3ce0eb0f-4a0d-4068-91e3-a8c6b2d09f28)
+
+[frontier_exploration.webm](https://github.com/user-attachments/assets/0c842465-11bb-421b-8808-8dfbf9d3683e)
+
+Code can be found in autonomy_repo/scripts/frontier_explorer.py and autonomy_repo/scripts/navigator.py 
+
 
 
 
